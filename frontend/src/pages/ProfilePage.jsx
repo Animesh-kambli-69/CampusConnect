@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import useAuth from '../hooks/useAuth'
 import useUserStore from '../store/userStore'
+import { useTheme } from '../hooks/useTheme'
 import { updateProfile, uploadAvatar, uploadResume, deleteResume } from '../services/userService'
 import { getInitials } from '../utils/helpers'
 
@@ -15,6 +16,7 @@ function ProfilePage() {
   const aiAnalyzing = useUserStore((state) => state.resumeAiAnalyzing)
   const setAiAnalyzing = useUserStore((state) => state.setResumeAiAnalyzing)
   const queryClient = useQueryClient()
+  const { theme, toggleTheme } = useTheme()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -518,6 +520,38 @@ function ProfilePage() {
                   <span>⚠️</span> {resumeError}
                 </p>
               )}
+            </div>
+
+            {/* Settings Section */}
+            <div className="bg-gray-800 border border-gray-700/60 rounded-2xl p-6 mt-5">
+              <h2 className="text-white font-semibold mb-5">Settings</h2>
+
+              {/* Theme Toggle */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl border border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{theme === 'dark' ? '🌙' : '☀️'}</span>
+                    <div>
+                      <p className="text-white font-medium text-sm">Theme</p>
+                      <p className="text-gray-400 text-xs">
+                        Currently: <span className="capitalize font-semibold">{theme}</span> mode
+                      </p>
+                    </div>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleTheme}
+                    className="relative w-14 h-8 bg-indigo-600 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                  >
+                    <motion.div
+                      className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md"
+                      animate={{ x: theme === 'light' ? 28 : 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  </motion.button>
+                </div>
+              </div>
             </div>
 
             {/* AI Resume Analysis */}
