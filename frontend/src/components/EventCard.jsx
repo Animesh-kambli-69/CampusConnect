@@ -6,12 +6,12 @@ import { formatDate, getInitials } from '../utils/helpers'
 import { optimizeCloudinaryUrl } from '../lib/optimization'
 
 const CATEGORY_COLORS = {
-  hackathon: 'bg-purple-900/40 text-purple-400 border-purple-700/40',
-  workshop: 'bg-blue-900/40 text-blue-400 border-blue-700/40',
-  seminar: 'bg-cyan-900/40 text-cyan-400 border-cyan-700/40',
-  cultural: 'bg-pink-900/40 text-pink-400 border-pink-700/40',
-  sports: 'bg-green-900/40 text-green-400 border-green-700/40',
-  other: 'bg-gray-700/60 text-gray-400 border-gray-600/40',
+  hackathon: 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 text-purple-300 border-purple-500/30',
+  workshop: 'bg-gradient-to-r from-blue-600/30 to-cyan-600/30 text-blue-300 border-blue-500/30',
+  seminar: 'bg-gradient-to-r from-cyan-600/30 to-sky-600/30 text-cyan-300 border-cyan-500/30',
+  cultural: 'bg-gradient-to-r from-pink-600/30 to-rose-600/30 text-pink-300 border-pink-500/30',
+  sports: 'bg-gradient-to-r from-green-600/30 to-emerald-600/30 text-green-300 border-green-500/30',
+  other: 'bg-gray-700/50 text-gray-300 border-gray-600/30',
 }
 
 // Calculate countdown for upcoming events
@@ -34,17 +34,17 @@ function getCountdown(targetDate) {
 
 function EventCard({ event }) {
   // Destructuring with fallbacks to prevent crashes
-  const { 
-    id, 
-    _id, 
-    title = 'Untitled Event', 
-    description = '', 
-    date, 
-    venue = 'TBD', 
-    category = 'other', 
-    organizer, 
-    imageUrl, 
-    registeredUsers = [] 
+  const {
+    id,
+    _id,
+    title = 'Untitled Event',
+    description = '',
+    date,
+    venue = 'TBD',
+    category = 'other',
+    organizer,
+    imageUrl,
+    registeredUsers = []
   } = event || {}
 
   const eventId = id || _id
@@ -68,100 +68,134 @@ function EventCard({ event }) {
 
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(99,102,241,0.2)' }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(79, 70, 229, 0.3)' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Link
         to={`/events/${eventId}`}
-        className="block bg-gray-800 border border-gray-700/60 rounded-xl overflow-hidden hover:border-indigo-500/60 transition-all group relative"
+        className="block bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 border border-gray-700/60 rounded-2xl overflow-hidden hover:border-indigo-500/60 transition-all group relative shadow-lg shadow-black/20"
       >
-        {/* Registered indicator - Absolute Positioned */}
+        {/* Registered indicator - Animated Badge */}
         {isRegistered && !isPast && (
-          <div className="absolute top-2 right-2 z-20">
-            <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-lg bg-emerald-500 text-white shadow-lg backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-3 right-3 z-20"
+          >
+            <span className="flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30 backdrop-blur-sm">
               ✓ Registered
             </span>
-          </div>
+          </motion.div>
         )}
 
         {/* Header/Image Section */}
-        <div className="h-32 relative overflow-hidden bg-gray-900">
+        <div className="h-36 relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
           {imageUrl ? (
-            <img
-              src={optimizeCloudinaryUrl(imageUrl, { width: 600, height: 300, crop: 'fill' })}
-              alt={title}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <>
+              <motion.img
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.5 }}
+                src={optimizeCloudinaryUrl(imageUrl, { width: 600, height: 300, crop: 'fill' })}
+                alt={title}
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+              {/* Dark overlay for better contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/40 to-transparent" />
+            </>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-indigo-900/40 via-gray-800 to-violet-900/40 flex items-center justify-center">
-              <span className="text-4xl opacity-20">📅</span>
+            <div className="w-full h-full bg-gradient-to-br from-indigo-900/40 via-grad-800 to-violet-900/40 flex items-center justify-center group-hover:from-indigo-900/60 group-hover:to-violet-900/60 transition-all">
+              <motion.span
+                whileHover={{ scale: 1.2 }}
+                className="text-5xl opacity-40 group-hover:opacity-60 transition-opacity"
+              >
+                📅
+              </motion.span>
             </div>
           )}
-          
-          {/* Overlay Gradient for better badge visibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent" />
 
-          {/* Category badge */}
-          <span className={`absolute bottom-2 left-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border z-10 ${colorClass}`}>
+          {/* Category badge - styled with gradient */}
+          <motion.span
+            whileHover={{ scale: 1.05 }}
+            className={`absolute bottom-3 left-3 text-xs uppercase font-bold px-3 py-1.5 rounded-full border z-10 ${colorClass} shadow-md backdrop-blur-sm`}
+          >
             {category}
-          </span>
+          </motion.span>
 
           {isPast && (
-            <span className="absolute top-2 right-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-gray-900/80 text-gray-400 border border-gray-700 z-10">
+            <span className="absolute top-3 left-3 text-xs uppercase font-bold px-3 py-1.5 rounded-full bg-gray-900/80 text-gray-400 border border-gray-700 z-10 shadow-md backdrop-blur-sm">
               Ended
             </span>
           )}
         </div>
 
         {/* Body Section */}
-        <div className="p-4">
-          <h3 className="text-white font-semibold text-sm leading-tight line-clamp-2 group-hover:text-indigo-400 transition-colors mb-3">
+        <div className="p-4 flex flex-col h-full">
+          <h3 className="text-white font-bold text-sm leading-tight line-clamp-2 group-hover:text-indigo-300 transition-colors mb-3">
             {title}
           </h3>
 
-          <div className="space-y-1.5 mb-4">
-            <div className="flex items-center gap-2 text-indigo-400">
-              <span className="text-xs">🗓</span>
-              <span className="text-xs font-medium">{formatDate(date)}</span>
-            </div>
-            
+          <div className="space-y-2 mb-3">
+            <motion.div
+              whileHover={{ x: 2 }}
+              className="flex items-center gap-2 text-indigo-400 font-semibold"
+            >
+              <span className="text-base">🗓</span>
+              <span className="text-xs">{formatDate(date)}</span>
+            </motion.div>
+
             {venue && (
-              <div className="flex items-center gap-2 text-gray-500">
-                <span className="text-xs">📍</span>
-                <span className="text-xs truncate">{venue}</span>
+              <div className="flex items-center gap-2 text-gray-400 hover:text-gray-300 transition-colors">
+                <span className="text-base">📍</span>
+                <span className="text-xs truncate font-medium">{venue}</span>
               </div>
             )}
 
-            {/* Countdown for upcoming events */}
+            {/* Countdown for upcoming events - with animation */}
             {!isPast && countdown && (
-              <div className="flex items-center gap-2 text-amber-400 bg-amber-400/10 w-fit px-2 py-0.5 rounded-md mt-1">
-                <span className="text-[10px]">⏱</span>
-                <span className="text-[10px] font-bold uppercase">{countdown}</span>
-              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2 text-amber-300 bg-gradient-to-r from-amber-500/20 to-orange-500/20 w-fit px-3 py-1.5 rounded-lg mt-1 border border-amber-500/30 font-bold text-xs uppercase tracking-wide"
+              >
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-sm inline-block"
+                >
+                  ⏱
+                </motion.span>
+                {countdown}
+              </motion.div>
             )}
           </div>
 
           {description && (
-            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-4">
+            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
               {description}
             </p>
           )}
 
           {/* Organizer Footer */}
           {organizer && (
-            <div className="flex items-center gap-2 pt-3 border-t border-gray-700/40">
-              <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px] font-bold overflow-hidden shrink-0 ring-1 ring-white/10">
+            <motion.div
+              whileHover={{ x: 2 }}
+              className="flex items-center gap-2 pt-3 mt-auto border-t border-gray-700/40"
+            >
+              <motion.div
+                whileHover={{ scale: 1.15 }}
+                className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0 ring-2 ring-indigo-500/30 shadow-md"
+              >
                 {organizer.avatarUrl ? (
                   <img src={organizer.avatarUrl} alt={organizer.name} className="w-full h-full object-cover" />
                 ) : (
                   <span>{getInitials(organizer.name || 'U')}</span>
                 )}
-              </div>
-              <span className="text-gray-500 text-[11px] truncate font-medium">
-                Organized by <span className="text-gray-400">{organizer.name}</span>
+              </motion.div>
+              <span className="text-gray-500 text-xs truncate font-medium">
+                By <span className="text-indigo-300 font-semibold">{organizer.name}</span>
               </span>
-            </div>
+            </motion.div>
           )}
         </div>
       </Link>

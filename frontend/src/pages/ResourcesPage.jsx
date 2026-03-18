@@ -223,84 +223,144 @@ function ResourceCard({ resource, currentUserId, onDelete }) {
 
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(79,70,229,0.15)' }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="bg-gray-800/60 border border-gray-700/50 rounded-2xl p-5 flex flex-col gap-3 hover:border-indigo-500/40 transition-colors"
+      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(79, 70, 229, 0.25)' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      className="bg-gradient-to-br from-gray-800 via-gray-800/80 to-gray-900/80 border border-gray-700/60 rounded-2xl p-5 flex flex-col gap-4 hover:border-indigo-500/60 transition-all shadow-lg shadow-black/20"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-3 min-w-0">
-          <span className="text-2xl flex-shrink-0 mt-0.5">{icon}</span>
+      {/* Header with icon and title */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3.5 min-w-0">
+          <motion.span
+            whileHover={{ scale: 1.2, rotate: 10 }}
+            className="text-3xl flex-shrink-0 mt-0.5"
+          >
+            {icon}
+          </motion.span>
           <div className="min-w-0">
-            <h3 className="text-white font-semibold text-sm leading-snug truncate">{resource.title}</h3>
+            <h3 className="text-white font-bold text-sm leading-snug truncate hover:text-indigo-300 transition-colors">{resource.title}</h3>
             {resource.description && (
-              <p className="text-gray-500 text-xs mt-0.5 line-clamp-2">{resource.description}</p>
+              <p className="text-gray-400 text-xs mt-1 line-clamp-2 leading-relaxed">{resource.description}</p>
             )}
           </div>
         </div>
         {isOwner && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.2, rotate: 90 }}
             onClick={() => onDelete(resource._id)}
-            className="text-gray-600 hover:text-red-400 text-lg leading-none flex-shrink-0 transition-colors"
+            className="text-gray-500 hover:text-red-400 text-xl leading-none flex-shrink-0 transition-colors font-bold"
             title="Delete resource"
           >
             ×
-          </button>
+          </motion.button>
         )}
       </div>
 
-      {/* AI Summary Accordion */}
+      {/* AI Summary Accordion - Enhanced */}
       {resource.aiSummary && (
-        <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg overflow-hidden">
-          <button
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-gradient-to-r from-indigo-600/20 to-violet-600/20 border border-indigo-500/30 rounded-xl overflow-hidden"
+        >
+          <motion.button
+            whileHover={{ backgroundColor: 'rgba(79, 70, 229, 0.15)' }}
             onClick={() => setShowAiSummary(!showAiSummary)}
-            className="w-full flex items-center justify-between px-3 py-2 text-xs text-indigo-300 hover:bg-indigo-900/30 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-xs text-indigo-200 font-semibold uppercase tracking-wide transition-colors"
           >
-            <span className="flex items-center gap-1.5">
-              <span>🤖</span> AI Summary
+            <span className="flex items-center gap-2">
+              <motion.span
+                animate={{ rotate: showAiSummary ? 360 : 0 }}
+                transition={{ duration: 0.3 }}
+                className="inline-block"
+              >
+                🤖
+              </motion.span>
+              AI Summary
             </span>
-            <span className="text-indigo-400">{showAiSummary ? '▲' : '▼'}</span>
-          </button>
+            <motion.span
+              animate={{ rotate: showAiSummary ? 180 : 0 }}
+              className="text-indigo-400"
+            >
+              ▼
+            </motion.span>
+          </motion.button>
           {showAiSummary && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="px-3 pb-3"
+              transition={{ duration: 0.2 }}
+              className="px-4 pb-3 border-t border-indigo-500/20"
             >
-              <p className="text-gray-400 text-xs leading-relaxed">{resource.aiSummary}</p>
+              <p className="text-gray-300 text-xs leading-relaxed font-medium">{resource.aiSummary}</p>
             </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
 
-      <div className="flex flex-wrap gap-1.5">
-        <span className="bg-indigo-500/20 text-indigo-300 text-xs px-2.5 py-1 rounded-full font-medium">{resource.subject}</span>
-        <span className="bg-gray-700 text-gray-300 text-xs px-2.5 py-1 rounded-full">Sem {resource.semester}</span>
-        <span className="bg-gray-700 text-gray-300 text-xs px-2.5 py-1 rounded-full">{resource.branch}</span>
+      {/* Subject, semester, branch tags */}
+      <div className="flex flex-wrap gap-2">
+        <motion.span
+          whileHover={{ scale: 1.05 }}
+          className="bg-gradient-to-r from-indigo-600/40 to-violet-600/40 text-indigo-200 text-xs px-3 py-1.5 rounded-full font-bold border border-indigo-500/30 shadow-md shadow-indigo-500/10"
+        >
+          📚 {resource.subject}
+        </motion.span>
+        <span className="bg-gray-700/50 text-gray-300 text-xs px-3 py-1.5 rounded-full font-semibold border border-gray-600/30">
+          📖 Sem {resource.semester}
+        </span>
+        <span className="bg-gray-700/50 text-gray-300 text-xs px-3 py-1.5 rounded-full font-semibold border border-gray-600/30">
+          🏢 {resource.branch}
+        </span>
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center text-white text-[10px] font-semibold overflow-hidden flex-shrink-0">
+      {/* Footer: uploader info and download button */}
+      <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/40">
+        <motion.div
+          whileHover={{ x: 2 }}
+          className="flex items-center gap-3 min-w-0"
+        >
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0 ring-2 ring-indigo-500/30 shadow-md"
+          >
             {resource.uploadedBy?.avatarUrl
-              ? <img src={optimizeCloudinaryUrl(resource.uploadedBy.avatarUrl, { width: 24, height: 24, crop: 'fill' })} alt="" loading="lazy" className="w-6 h-6 object-cover rounded-full" />
+              ? <img
+                src={optimizeCloudinaryUrl(resource.uploadedBy.avatarUrl, { width: 32, height: 32, crop: 'fill' })}
+                alt=""
+                loading="lazy"
+                className="w-8 h-8 object-cover"
+              />
               : resource.uploadedBy?.name?.[0]?.toUpperCase()}
-          </div>
+          </motion.div>
           <div className="min-w-0">
-            <p className="text-gray-400 text-xs truncate">{resource.uploadedBy?.name}</p>
-            <p className="text-gray-600 text-[10px]">
+            <p className="text-gray-300 text-xs font-semibold truncate">{resource.uploadedBy?.name}</p>
+            <p className="text-gray-500 text-[11px]">
               {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
-              {resource.fileSize ? ` · ${formatBytes(resource.fileSize)}` : ''}
+              {resource.fileSize ? ` • ${formatBytes(resource.fileSize)}` : ''}
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <button
-          onClick={handleDownload} disabled={downloading}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0"
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-all shadow-md shadow-indigo-600/30 hover:shadow-indigo-600/50 flex-shrink-0 uppercase tracking-wide"
         >
-          {downloading ? '...' : '⬇ Download'}
-        </button>
+          {downloading ? (
+            <>
+              <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Loading...
+            </>
+          ) : (
+            <>
+              ⬇
+              Download
+            </>
+          )}
+        </motion.button>
       </div>
     </motion.div>
   )
