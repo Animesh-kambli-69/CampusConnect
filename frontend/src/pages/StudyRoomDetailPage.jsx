@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion, AnimatePresence } from 'framer-motion'
 import { io } from 'socket.io-client'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
@@ -30,6 +31,7 @@ function StudyRoomDetailPage() {
   const queryClient = useQueryClient()
   const socketRef = useRef(null)
   const [liveTimer, setLiveTimer] = useState(null) // { elapsed, isRunning, phase, startedAt }
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
   const intervalRef = useRef(null)
 
   const { data: room, isLoading } = useQuery({
@@ -257,7 +259,7 @@ function StudyRoomDetailPage() {
             )}
             {isMember && (
               <button
-                onClick={() => { if (window.confirm('Leave this study room?')) leaveMutation.mutate() }}
+                onClick={() => setShowLeaveModal(true)}
                 disabled={leaveMutation.isPending}
                 className="bg-gray-700 hover:bg-red-900/40 text-gray-300 hover:text-red-300 disabled:opacity-50 px-5 py-2.5 rounded-lg text-sm font-medium transition-all"
               >
@@ -265,6 +267,83 @@ function StudyRoomDetailPage() {
               </button>
             )}
           </div>
+
+          {/* Leave Confirmation Modal */}
+          <AnimatePresence>
+            {showLeaveModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => !leaveMutation.isPending && setShowLeaveModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 border border-gray-700/60 rounded-2xl p-6 max-w-sm w-full shadow-2xl shadow-black/50"
+                >
+                  {/* Icon */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center">
+                      <span className="text-2xl">⚠️</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h2 className="text-white text-lg font-bold text-center mb-2">
+                    Leave Study Room?
+                  </h2>
+
+                  {/* Description */}
+                  <p className="text-gray-400 text-sm text-center mb-6">
+                    You will be removed from <span className="text-white font-semibold">{room.name}</span>. You can rejoin anytime.
+                  </p>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowLeaveModal(false)}
+                      disabled={leaveMutation.isPending}
+                      className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Stay
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        leaveMutation.mutate()
+                      }}
+                      disabled={leaveMutation.isPending}
+                      className="flex-1 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      {leaveMutation.isPending ? (
+                        <>
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                            className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full"
+                          />
+                          Leaving...
+                        </>
+                      ) : (
+                        <>
+                          <span>✓</span>
+                          Leave Room
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
     </div>
