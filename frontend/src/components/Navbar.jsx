@@ -31,11 +31,12 @@ function NavLink({ to, children }) {
   )
 }
 
-function Navbar() {
+function Navbar({ onMenuToggle }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const dropdownRef = useRef(null)
 
   const { data: notifications = [] } = useQuery({
@@ -82,7 +83,32 @@ function Navbar() {
       <div className="max-w-full mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            {/* Mobile menu button */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen)
+                onMenuToggle?.(!mobileMenuOpen)
+              }}
+              className="md:hidden flex flex-col gap-1.5 p-1.5"
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              <motion.span
+                animate={mobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+                className="w-5 h-0.5 bg-gray-300 rounded-full block"
+              />
+              <motion.span
+                animate={mobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+                className="w-5 h-0.5 bg-gray-300 rounded-full block"
+              />
+              <motion.span
+                animate={mobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+                className="w-5 h-0.5 bg-gray-300 rounded-full block"
+              />
+            </motion.button>
+
             <Link to="/dashboard" className="flex items-center space-x-2.5 group">
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center shadow-glow-indigo group-hover:scale-105 transition-transform">
                 <span className="text-white font-bold text-sm">CC</span>

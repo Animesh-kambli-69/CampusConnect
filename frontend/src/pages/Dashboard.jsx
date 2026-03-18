@@ -135,7 +135,7 @@ function Dashboard() {
       <Navbar />
       <div className="flex pt-16">
         <Sidebar />
-        <main id="main-content" className="flex-1 md:ml-64 max-w-full" role="main">
+        <main id="main-content" className="flex-1 md:ml-64 max-w-full md:pb-0 pb-20" role="main">
           {/* Hero Greeting Strip */}
           <div className="bg-gradient-to-r from-indigo-600/20 via-violet-600/20 to-purple-600/20 border-b border-indigo-700/30 px-6 py-6">
             <div className="flex items-center gap-4 max-w-full">

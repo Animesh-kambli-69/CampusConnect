@@ -10,6 +10,7 @@ import { ResourceSkeleton } from '../components/ui/Skeleton'
 import useAuth from '../hooks/useAuth'
 import { getResources, uploadResource, downloadResource, deleteResource } from '../services/resourceService'
 import { staggerContainer, staggerItem, modalVariants, backdropVariants } from '../lib/motion'
+import { useDebounce, optimizeCloudinaryUrl } from '../lib/optimization'
 
 const BRANCHES = [
   'Computer Engineering', 'Information Technology', 'Electronics', 'Mechanical',
@@ -282,7 +283,7 @@ function ResourceCard({ resource, currentUserId, onDelete }) {
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center text-white text-[10px] font-semibold overflow-hidden flex-shrink-0">
             {resource.uploadedBy?.avatarUrl
-              ? <img src={resource.uploadedBy.avatarUrl} alt="" className="w-6 h-6 object-cover rounded-full" />
+              ? <img src={optimizeCloudinaryUrl(resource.uploadedBy.avatarUrl, { width: 24, height: 24, crop: 'fill' })} alt="" loading="lazy" className="w-6 h-6 object-cover rounded-full" />
               : resource.uploadedBy?.name?.[0]?.toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -315,11 +316,17 @@ function ResourcesPage() {
   const [filterBranch, setFilterBranch] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
+  // Debounce search and filters to reduce API calls
+  const debouncedSearch = useDebounce(search, 500)
+  const debouncedSubject = useDebounce(filterSubject, 500)
+  const debouncedSemester = useDebounce(filterSemester, 300)
+  const debouncedBranch = useDebounce(filterBranch, 300)
+
   const params = {}
-  if (search) params.search = search
-  if (filterSubject) params.subject = filterSubject
-  if (filterSemester) params.semester = filterSemester
-  if (filterBranch) params.branch = filterBranch
+  if (debouncedSearch) params.search = debouncedSearch
+  if (debouncedSubject) params.subject = debouncedSubject
+  if (debouncedSemester) params.semester = debouncedSemester
+  if (debouncedBranch) params.branch = debouncedBranch
 
   const { data: resources = [], isLoading } = useQuery({
     queryKey: ['resources', params],
@@ -345,7 +352,7 @@ function ResourcesPage() {
       <Navbar />
       <div className="flex pt-16">
         <Sidebar />
-        <main className="flex-1 md:ml-64 px-6 py-6 max-w-7xl">
+        <main className="flex-1 md:ml-64 px-6 py-6 max-w-7xl md:pb-0 pb-20">
 
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

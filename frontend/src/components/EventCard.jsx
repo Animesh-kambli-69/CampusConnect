@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { memo } from 'react'
 import { motion } from 'framer-motion'
 import { formatDate, getInitials } from '../utils/helpers'
+import { optimizeCloudinaryUrl } from '../lib/optimization'
 
 const CATEGORY_COLORS = {
   hackathon: 'bg-purple-900/40 text-purple-400 border-purple-700/40',
@@ -85,10 +87,11 @@ function EventCard({ event }) {
         {/* Header/Image Section */}
         <div className="h-32 relative overflow-hidden bg-gray-900">
           {imageUrl ? (
-            <img 
-              src={imageUrl} 
-              alt={title} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            <img
+              src={optimizeCloudinaryUrl(imageUrl, { width: 600, height: 300, crop: 'fill' })}
+              alt={title}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-indigo-900/40 via-gray-800 to-violet-900/40 flex items-center justify-center">
@@ -166,4 +169,4 @@ function EventCard({ event }) {
   )
 }
 
-export default EventCard;
+export default memo(EventCard)

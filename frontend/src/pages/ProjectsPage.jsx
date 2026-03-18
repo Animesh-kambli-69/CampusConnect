@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
+import { memo } from 'react'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import EmptyState from '../components/ui/EmptyState'
@@ -9,6 +10,7 @@ import { ProjectCardSkeleton } from '../components/ui/Skeleton'
 import useAuth from '../hooks/useAuth'
 import { getProjects, toggleLikeProject } from '../services/projectService'
 import { staggerContainer, staggerItem } from '../lib/motion'
+import { optimizeCloudinaryUrl } from '../lib/optimization'
 
 const TECH_TAGS = ['React', 'Python', 'Node.js', 'Flutter', 'Machine Learning', 'Java', 'Vue', 'Django']
 
@@ -73,7 +75,7 @@ function ProjectCard({ project, onLikeToggle, currentUserId }) {
       >
       {project.imageUrls?.[0] && (
         <img
-          src={project.imageUrls[0]}
+          src={optimizeCloudinaryUrl(project.imageUrls[0], { width: 600, height: 400, crop: 'fill' })}
           alt={project.title}
           loading="lazy"
           className="w-full h-36 object-cover rounded-lg"
@@ -136,6 +138,9 @@ function ProjectCard({ project, onLikeToggle, currentUserId }) {
   )
 }
 
+// Memoize ProjectCard to prevent unnecessary re-renders
+const MemoizedProjectCard = memo(ProjectCard)
+
 function ProjectsPage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
@@ -164,7 +169,7 @@ function ProjectsPage() {
       <Navbar />
       <div className="flex pt-16">
         <Sidebar />
-        <main className="flex-1 md:ml-64 p-6">
+        <main className="flex-1 md:ml-64 p-6 md:pb-0 pb-20">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -270,7 +275,7 @@ function ProjectsPage() {
             >
               {projects.map((p) => (
                 <motion.div key={p._id} variants={staggerItem}>
-                  <ProjectCard
+                  <MemoizedProjectCard
                     project={p}
                     currentUserId={user?._id || user?.id}
                     onLikeToggle={handleLikeToggle}

@@ -1,313 +1,204 @@
-# 🎨 CampusConnect — UI Enhancement Roadmap (Remaining Tasks)
+# 🎨 CampusConnect — UI Enhancement Roadmap
 
-> Continuing UI polish from Phase 6 onwards
-
----
-
-## ✅ COMPLETED PHASES
-
-- ✅ **Phase 1**: Foundation (packages, UI components, Tailwind config)
-- ✅ **Phase 2**: Landing Page (fully redesigned)
-- ✅ **Phase 3**: App Shell (Navbar + Sidebar with animations)
-- ✅ **Phase 4**: Dashboard (hero greeting, animated stats, activity feed)
-- ✅ **Phase 5**: Core Pages Polish (Profile, Events, Projects, Resources)
-  - Profile: Cover banner, prominent badges/points, color-coded skill chips, toast notifications
-  - Events: Countdown timers, registered state visual, hover animations
-  - Projects: Color-coded tech chips, heart animation for likes, motion cards
-  - Resources: AI summary accordion, file type icons, toast notifications
+> **Overall Progress: 75% Complete** | Last updated: March 2026
 
 ---
 
-## Phase 6 — Details & Delight (Partially Complete)
+## ✅ COMPLETED FEATURES (Phases 1-8)
 
-### 6.1 Toasts everywhere
-- Every `useMutation` `onSuccess` / `onError` uses `react-hot-toast`
-- `toast.success`, `toast.error`, `toast.loading` → replace all plain error state
+### Phase 1 — Foundation ✅ 100%
+- [x] Installed packages: `framer-motion`, `react-hot-toast`, `clsx`, `tailwind-merge`, `react-countup`
+- [x] Created shared UI components: `Button`, `Card`, `Input`, `Badge`
+- [x] Configured Tailwind with custom colors and animations
+- [x] Set up `cn()` utility for class merging
 
-### 6.2 Consistent empty states
-- SVG illustration (inline, no external assets) for every empty page state
-- Consistent pattern: illustration + headline + sub-text + CTA button
+### Phase 2 — Landing Page ✅ 100%
+- [x] Full redesign with hero section
+- [x] Animated background gradients
+- [x] Feature cards with hover effects
+- [x] Responsive layout
 
-### 6.3 Button & Form polish
-- All submit buttons: `disabled` state with spinner
-- Input fields: smooth focus ring with `ring-2 ring-indigo-500/50 transition-shadow`
-- Form error messages slide in via framer-motion
+### Phase 3 — App Shell ✅ 100%
+- [x] Navbar with glass morphism effect (`backdrop-blur-md`)
+- [x] Animated notification badge with spring animation
+- [x] Sidebar with grouped navigation
+- [x] Sliding active indicator using `layoutId`
 
-### 6.4 Page transitions
-- Wrap all page components in `PageWrapper`
-- Fade + slight Y slide-in (`y: 8 → 0`) on route change
+### Phase 4 — Dashboard ✅ 100%
+- [x] Hero greeting strip with avatar and stats
+- [x] Animated stat cards with `CountUp`
+- [x] Pinned announcements widget
+- [x] Upcoming events widget
+- [x] Quick actions grid
 
----
+### Phase 5 — Core Pages Polish ✅ 100%
+- [x] **Profile**: Cover banner, prominent badges/points, color-coded skill chips
+- [x] **Events**: Countdown timers, registered state visual, hover animations
+- [x] **Projects**: Color-coded tech chips, heart animation for likes, motion cards
+- [x] **Resources**: AI summary accordion, file type icons, upload modal
 
-## Summary Table (Remaining Work)
+### Phase 6 — Details & Delight ✅ 100%
+- [x] Toast notifications everywhere (`react-hot-toast`)
+- [x] `EmptyState` component with inline SVG illustrations for all empty states
+- [x] `PageWrapper` with fade/slide page transitions
+- [x] Button press animations (`scale: 0.98` on tap)
+- [x] Spinner states in submit buttons
+- [x] Modal entrance animations (scale + fade)
 
-| # | Item | Phase | Time Est | Priority | Status |
-|---|---|---|---|---|---|
-| 1 | Profile page polish | 5 | 1 hr | High | ✅ Done |
-| 2 | Events + Projects cards | 5 | 1 hr | High | ✅ Done |
-| 3 | Resources + Study Room | 5 | 1 hr | Medium | ✅ Done |
-| 4 | Toasts everywhere | 6 | 1 hr | High | ✅ Done |
-| 5 | Empty states + transitions | 6 | 1.5 hrs | Medium | Pending |
-| 6 | Advanced animations | 7 | 2 hrs | Medium | Pending |
-| 7 | Performance & A11y | 8 | 2 hrs | High | Pending |
-| 8 | Mobile responsive | 9 | 3 hrs | High | Pending |
-| 9 | Dark mode (optional) | 10 | 2 hrs | Low | Pending |
-| 10 | Testing & QA | 11 | 2 hrs | High | Pending |
-| **TOTAL** | **Remaining** | **6-11** | **~10.5 hrs** | - | - |
+### Phase 7 — Advanced Animations ✅ 100%
+- [x] Skeleton loading components (`Skeleton`, `CardSkeleton`, `EventCardSkeleton`, etc.)
+- [x] Shimmer animation for skeleton placeholders
+- [x] Stagger animations for Events, Projects, Resources grids
+- [x] Card lift on hover effect
+- [x] Delete confirmation modal with animations
+- [x] Reusable motion variants library (`lib/motion.js`)
 
----
-
-## Phase 7 — Advanced Animation & Microinteractions
-
-### 7.1 Loading States
-- **Skeleton screens** for all data-fetching pages (Events, Projects, Resources, etc.)
-- Custom skeleton components using `shimmer` animation
-- Replace generic "Loading..." text with proper skeleton UI
-
-### 7.2 List Animations
-- Stagger animations for all list/grid views
-- framer-motion `staggerChildren` on: events list, projects grid, resources list, connections grid
-- Example pattern:
-  ```jsx
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    variants={{ container: { transition: { staggerChildren: 0.1 } } }}
-  >
-    {items.map(item => <motion.div variants={itemVariants} />)}
-  </motion.div>
-  ```
-
-### 7.3 Interactive Feedback
-- Button press animation (`scale: 0.98` on tap)
-- Card lift on hover for all clickable cards
-- Ripple effect on like/upvote buttons
-- Checkbox/toggle switch smooth transitions
-
-### 7.4 Modal & Dropdown Animations
-- Scale + fade modal entrances (`scale: 0.95 → 1` + fade)
-- Dropdown menus slide from top with spring animation
-- Sheet/drawer components slide in from bottom/side
+### Phase 8 — Performance & Accessibility ✅ 90%
+- [x] Code-splitting with `React.lazy()` for all pages
+- [x] `Suspense` fallback with loading spinner
+- [x] `LazyImage` component with blur-up loading
+- [x] `loading="lazy"` on images
+- [x] Skip-to-content link for keyboard users
+- [x] ARIA labels on navigation (`role="navigation"`, `aria-label`)
+- [x] `id="main-content"` on main sections
+- [x] Focus ring utility class
+- [ ] Cloudinary URL optimization (`f_auto,q_auto`) — *pending*
+- [ ] Debounce search inputs — *pending*
+- [ ] Memoize heavy components (`React.memo`) — *pending*
 
 ---
 
-## Phase 8 — Performance & Accessibility
+## 📋 REMAINING FEATURES TO IMPLEMENT
 
-### 8.1 Image Optimization
-- Add lazy loading to all images: `loading="lazy"`
-- Cloudinary URL optimization (add `f_auto,q_auto` parameters)
-- Placeholder blur effect while images load
+### Phase 8.5 — Performance Optimizations (Small Wins) ⏳ ~2 hours
+| # | Task | Priority | Est. Time | Notes |
+|----|------|----------|-----------|-------|
+| 1 | Cloudinary URL optimization | Medium | 30 min | Add `f_auto,q_auto` to image URLs |
+| 2 | Debounce search inputs | Medium | 30 min | SearchPage, ResourcesPage filters |
+| 3 | Memoize heavy components | Low | 30 min | ProjectCard, EventCard, ResourceCard |
+| 4 | Virtual scrolling for long lists | Low | 1 hr | Optional: `react-window` for 100+ items |
 
-### 8.2 Accessibility (a11y)
-- All interactive elements have proper `aria-label`
-- Focus-visible styles for keyboard navigation
-- Proper heading hierarchy (h1 → h2 → h3)
-- Skip-to-content link for keyboard users
-- Color contrast validation (WCAG AA standard)
+### Phase 9 — Mobile-First Responsive Design 📱 ⏳ ~6 hours
+| # | Task | Priority | Est. Time | Status |
+|----|------|----------|-----------|--------|
+| 1 | Mobile hamburger menu | High | 1 hr | Components created: `MobileDrawer.jsx` |
+| 2 | Bottom navigation bar | High | 1.5 hrs | Component created: `MobileBottomNav.jsx` |
+| 3 | Touch-friendly sizes (44x44px) | High | 30 min | Update buttons, links, tap targets |
+| 4 | Single-column mobile layouts | High | 1 hr | Test `.flex-col` on small screens |
+| 5 | Swipe-to-delete on items | Medium | 1 hr | Optional: `react-use-gesture` library |
+| 6 | Pull-to-refresh on feeds | Low | 1 hr | Optional: `react-refresh-kit` |
 
-### 8.3 Performance
-- Code-splitting: lazy load heavy pages (Workspace, Study Rooms)
-  ```jsx
-  const WorkspaceDetailPage = lazy(() => import('./pages/WorkspaceDetailPage'))
-  ```
-- Memo-ize heavy components (event cards, project cards)
-- Virtual scrolling for long lists (consider `react-window` for 100+ items)
-- Debounce search inputs
+### Phase 10 — Dark Mode (Optional) 🌙 ⏳ ~2 hours
+| # | Task | Priority | Est. Time | Notes |
+|----|------|----------|-----------|-------|
+| 1 | Create `ThemeProvider` context | Low | 30 min | Zustand store for theme preference |
+| 2 | Theme toggle in Profile | Low | 30 min | Add toggle switch to settings |
+| 3 | Persist to localStorage | Low | 15 min | Auto-load preference on mount |
+| 4 | Adjust light mode palette | Low | 1 hr | Create light theme Tailwind classes |
 
----
-
-## Phase 9 — Mobile-First Responsive Design
-
-### 9.1 Mobile Navbar
-- Sticky top navbar with slide-in sidebar
-- Bottom navigation bar for quick access (Dashboard, Events, Messages, Profile)
-- Hamburger menu with smooth slide animation
-
-### 9.2 Touch Interactions
-- Swipe-to-delete on list items (Marketplace, Lost & Found)
-- Pull-to-refresh on Dashboard and feeds
-- Touch-friendly button sizes (min 44x44px)
-
-### 9.3 Responsive Breakpoints
-- Mobile (`<640px`): Single column, bottom nav, drawer sidebar
-- Tablet (`640px-1024px`): Two columns, permanent sidebar
-- Desktop (`>1024px`): Full three-column layouts where appropriate
-
-### 9.4 Mobile-Specific Features
-- Camera integration for Lost & Found uploads
-- Share API integration for sharing events/projects
-- Haptic feedback on important actions (like, register, etc.)
+### Phase 11 — Testing & QA 🧪 ⏳ ~5 hours
+| # | Task | Priority | Est. Time | Notes |
+|----|------|----------|-----------|-------|
+| 1 | Browser testing | High | 1 hr | Chrome, Firefox, Safari, Edge |
+| 2 | Mobile device testing | High | 1 hr | iOS Safari, Android Chrome |
+| 3 | Lighthouse audit | High | 30 min | Target: 90+ on all metrics |
+| 4 | User testing | Medium | 2 hrs | Get 5+ students to test UI |
+| 5 | Bundle size analysis | Medium | 30 min | Check framer-motion tree-shaking |
 
 ---
 
-## Phase 10 — Dark Mode (Optional Enhancement)
+## 📊 Progress Summary
 
-### 10.1 Theme System Setup
-- Create `ThemeProvider` context
-- Toggle switch in Profile/Settings page
-- Persist preference to localStorage
-- Add dark mode classes to Tailwind config
+| Phase | Name | Progress | Status | Time |
+|-------|------|----------|--------|------|
+| 1 | Foundation | ✅ 100% | Done | — |
+| 2 | Landing Page | ✅ 100% | Done | — |
+| 3 | App Shell | ✅ 100% | Done | — |
+| 4 | Dashboard | ✅ 100% | Done | — |
+| 5 | Core Pages | ✅ 100% | Done | — |
+| 6 | Details & Delight | ✅ 100% | Done | — |
+| 7 | Advanced Animations | ✅ 100% | Done | — |
+| 8 | Performance & A11y | ✅ 90% | Mostly Done | 2 hrs remaining |
+| 9 | Mobile Responsive | ⏳ 5% | In Progress | ~6 hrs |
+| 10 | Dark Mode | ⏳ 0% | Not Started | ~2 hrs |
+| 11 | Testing & QA | ⏳ 0% | Not Started | ~5 hrs |
 
-### 10.2 Color Palette
-- Dark mode: `bg-gray-950`, `bg-gray-900`, `bg-gray-800` backgrounds
-- Softer text colors: `text-gray-100`, `text-gray-300`
-- Adjusted accent colors for dark backgrounds
-- Maintain brand gradient in both themes
-
----
-
-## Phase 11 — Testing & Quality Assurance
-
-### 11.1 Visual Regression Testing
-- Screenshot key pages before/after enhancements
-- Test on multiple browsers (Chrome, Firefox, Safari)
-- Test on actual mobile devices (iOS Safari, Android Chrome)
-
-### 11.2 User Testing
-- Get 5-10 real students to test the new UI
-- Collect feedback on:
-  - First impressions
-  - Navigation clarity
-  - Animation speed (too fast/slow?)
-  - Mobile experience
-
-### 11.3 Performance Benchmarks
-- Lighthouse score target: 90+ on all metrics
-- First Contentful Paint < 1.5s
-- Time to Interactive < 3s
-- Bundle size analysis (keep framer-motion tree-shaken)
+**Total Estimated Time Remaining: ~15 hours**
 
 ---
 
-## Implementation Strategy (Updated)
+## 📁 New Components Created
 
-### Current Status
-✅ Phases 1-4 complete! Foundation is solid.
-
-### Recommended Order (from Phase 5 onwards)
-1. **Phase 5** — Core page polish (Profile, Events, Projects, Resources)
-2. **Phase 6** — Polish pass (toasts, empty states, page transitions)
-3. **Phase 7** — Advanced animations (stagger lists, microinteractions)
-4. **Phase 8** — Performance & accessibility (lazy loading, a11y audit)
-5. **Phase 9** — Mobile responsive (touch interactions, bottom nav)
-6. **Phase 10** — Dark mode (optional)
-7. **Phase 11** — Testing & QA
-
-### Quick Wins (Next Steps)
-1. Replace all error alerts with toast notifications (Phase 6)
-2. Add page transitions with PageWrapper (Phase 6)
-3. Polish Profile page (Phase 5)
-4. Add empty state illustrations (Phase 6)
-
----
-
-## Success Metrics
-
-### Before vs After
-| Metric | Before | Target After |
-|---|---|---|
-| Lighthouse Performance | ~70 | 90+ |
-| Lighthouse Accessibility | ~75 | 95+ |
-| Time to Interactive | ~4s | <3s |
-| User "professional feel" rating | 6/10 | 9/10 |
-| Mobile usability score | 7/10 | 9/10 |
-
-### Qualitative Goals
-- ✅ Users describe UI as "polished" and "professional"
-- ✅ Animations feel smooth, not janky
-- ✅ First-time users can navigate without confusion
-- ✅ Mobile experience feels native, not web-cramped
-- ✅ Loading states never leave users wondering
-
----
-
-## Technology Stack Reference
-
-### Core Stack (Already In Use)
-- **Frontend**: React 18 + Vite
-- **Styling**: Tailwind CSS
-- **State**: Zustand + TanStack Query
-- **Routing**: React Router v6
-- **Real-time**: Socket.io client
-
-### New Dependencies (This Roadmap)
-```json
-{
-  "framer-motion": "^11.x",
-  "react-hot-toast": "^2.4.1",
-  "clsx": "^2.1.0",
-  "tailwind-merge": "^2.2.0",
-  "react-countup": "^6.5.0"
-}
+### UI Components
+```
+✅ EmptyState.jsx       — Empty states with SVG illustrations
+✅ Skeleton.jsx         — Loading skeleton components
+✅ LazyImage.jsx        — Lazy loading with blur placeholder
+✅ Button.jsx           — Animated buttons with spinner
+✅ Badge.jsx            — Color-coded badges
+✅ PageWrapper.jsx      — Page transition wrapper
+⏳ MobileBottomNav.jsx  — Mobile bottom navigation (created, not integrated)
+⏳ MobileDrawer.jsx     — Mobile hamburger menu (created, not integrated)
 ```
 
-### Optional (Phase 9+)
-- `react-window` — Virtual scrolling for very long lists
-- `@headlessui/react` — Accessible UI primitives (modals, dropdowns)
+### Configuration
+```
+✅ lib/motion.js        — 20+ reusable framer-motion variants
+✅ index.css            — Shimmer, focus-ring, skip-link styles
+```
 
 ---
 
-## Post-Completion Maintenance
+## 🎯 Next Steps (Priority Order)
 
-### Ongoing Tasks
-1. **Monitor bundle size** — Run `npm run build` and check for regressions
-2. **A11y audits** — Run axe DevTools quarterly
-3. **Animation performance** — Watch for layout thrash on low-end devices
-4. **User feedback loop** — Collect UI/UX feedback via in-app form
+### Immediate (Next Sprint)
+1. **Integrate Mobile Components** (1 hour)
+   - Connect MobileBottomNav.jsx to App.jsx (show on mobile breakpoint)
+   - Connect MobileDrawer.jsx to Navbar (hamburger button)
+   - Add `pb-16` to main content when mobile nav visible
 
-### Future Enhancements (Beyond This Roadmap)
-- Advanced search with filters and sorting
-- Drag-and-drop file uploads
-- Keyboard shortcuts (press `/` for search, etc.)
-- PWA support (offline mode, install prompt)
-- Native mobile app (React Native port)
+2. **Quick Performance Wins** (2 hours)
+   - Add Cloudinary `f_auto,q_auto` to all image URLs
+   - Debounce search inputs on ResourcesPage
+   - Memoize ProjectCard, EventCard, ResourceCard
 
----
+3. **Mobile Layout Pass** (1-2 hours)
+   - Ensure all pages work on mobile (iPhone 12/11 size)
+   - Test touch interactions
 
-## Troubleshooting Common Issues
-
-### Framer Motion Performance
-**Problem**: Animations feel sluggish
-**Solution**: Use `layout` prop sparingly, prefer `transform` over `width`/`height` animations
-
-### Toast Z-Index Issues
-**Problem**: Toasts appearing behind modals
-**Solution**: Set `<Toaster position="top-right" toastOptions={{ style: { zIndex: 9999 } }} />`
-
-### Tailwind Not Applying Classes
-**Problem**: New classes not showing up
-**Solution**: Check `tailwind.config.js` content paths include all component directories
-
-### Mobile Sidebar Scroll
-**Problem**: Body scrolls when sidebar is open
-**Solution**: Add `overflow-hidden` to body when sidebar is active
+### Future (Following Sprints)
+4. **Testing & QA** (3-4 hours) — Cross-browser and device testing
+5. **Dark Mode** (2 hours) — Optional but great UX enhancement
+6. **Advanced Features** — Swipe-to-delete, pull-to-refresh
 
 ---
 
-## Final Checklist
+## 📋 Quick Commands
 
-Before marking the roadmap as complete:
+```bash
+# Development
+cd frontend && npm run dev
 
-- [ ] All packages installed and versions locked in `package.json`
-- [ ] Shared UI components built and documented
-- [ ] Landing page deployed and tested on mobile
-- [ ] All core pages have proper loading states
-- [ ] Toast notifications replace all error/success alerts
-- [ ] Accessibility audit passes with 95+ score
-- [ ] Lighthouse performance score 90+ on all main pages
-- [ ] Mobile responsive tested on iPhone & Android
-- [ ] User testing conducted with 5+ real users
-- [ ] Bundle size analyzed and optimized
-- [ ] Dark mode implemented (if opted in)
+# Build for production
+cd frontend && npm run build
+
+# Check bundle size
+npm run build && npm run preview
+```
 
 ---
 
-## Contact & Support
+## Key Metrics (Goals)
 
-**Designer questions**: Refer to Figma mockups (if available)
-**Technical blockers**: Check framer-motion and Tailwind docs
-**Performance issues**: Use React DevTools Profiler
+| Metric | Current | Target |
+|--------|---------|--------|
+| Lighthouse Performance | ~75 | 90+ |
+| Lighthouse Accessibility | ~80 | 95+ |
+| Time to Interactive | ~3-4s | <3s |
+| Mobile Score | 70 | 90+ |
+| Overall UI Polish | Good | Excellent |
 
 ---
 
-**End of Roadmap** — Estimated total time: **16-24 hours** depending on team size and parallel work.
+**Last updated:** March 18, 2026
+**Maintained by:** UI Enhancement Team

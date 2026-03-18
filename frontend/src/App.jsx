@@ -1,9 +1,13 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import useUserStore from './store/userStore'
 import useAdminStore from './store/adminStore'
 import useSocket from './hooks/useSocket'
+
+// Mobile components
+import MobileBottomNav from './components/MobileBottomNav'
+import MobileDrawer from './components/MobileDrawer'
 
 // Core pages (loaded immediately)
 import LandingPage from './pages/LandingPage'
@@ -114,6 +118,7 @@ function CampusAdminProtectedRoute({ children }) {
 
 function App() {
   useSocket()
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
 
   return (
     <>
@@ -124,6 +129,9 @@ function App() {
           success: { iconTheme: { primary: '#6366f1', secondary: '#fff' } },
         }}
       />
+
+      <MobileDrawer isOpen={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} />
+
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -175,6 +183,8 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+
+      <MobileBottomNav />
     </>
   )
 }
