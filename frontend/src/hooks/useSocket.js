@@ -40,6 +40,22 @@ function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['events'] })
     })
 
+    socket.on('announcement:new', () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] })
+    })
+
+    socket.on('activity:new', () => {
+      queryClient.invalidateQueries({ queryKey: ['activity'] })
+    })
+
+    socket.on('project:new', () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    })
+
+    socket.on('studyroom:new', () => {
+      queryClient.invalidateQueries({ queryKey: ['study-rooms'] })
+    })
+
     // Incoming chat message from another user
     socket.on('new_message', ({ message, sender }) => {
       const senderId = sender?._id || message?.senderId?.toString()

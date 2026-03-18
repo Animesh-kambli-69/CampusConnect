@@ -4,7 +4,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const { protect, restrictTo } = require('../middleware/auth.middleware');
 const { uploadImage } = require('../config/cloudinary');
-const { getEvents, createEvent, getEventById } = require('../controllers/event.controller');
+const { getEvents, createEvent, getEventById, openAttendance, closeAttendance, markAttendance, getAttendees } = require('../controllers/event.controller');
 
 const router = express.Router();
 
@@ -52,5 +52,11 @@ router.post(
   createEvent
 );
 router.get('/:id', getEventById);
+
+// Attendance routes
+router.post('/:id/attendance/open',  restrictTo('committee', 'campusAdmin'), openAttendance);
+router.post('/:id/attendance/close', restrictTo('committee', 'campusAdmin'), closeAttendance);
+router.post('/:id/attendance/mark',  markAttendance);
+router.get('/:id/attendance',        restrictTo('committee', 'campusAdmin'), getAttendees);
 
 module.exports = router;

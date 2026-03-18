@@ -3,6 +3,7 @@
 const mongoose = require('mongoose');
 const Connection = require('../models/Connection');
 const User = require('../models/User');
+const { logActivity } = require('../utils/activity');
 
 /**
  * Helper – validate a MongoDB ObjectId and return a 400 if invalid.
@@ -136,6 +137,37 @@ async function acceptRequest(req, res, next) {
       success: true,
       message: 'Connection request accepted.',
       data: { connection },
+    });
+
+    const collegeId = req.user.collegeId?._id || req.user.collegeId;
+    setImmediate(() => {
+      logActivity({
+        type: 'connection:made',
+        actor: req.user,
+        meta: {
+          otherUserId: connection.senderId._id,
+          otherUserName: connection.senderId.name,
+        },
+        collegeId,
+      });
+
+      // Award points to both parties
+      (async () => {
+        try {
+          await User.findByIdAndUpdate(req.user._id, { $inc: { points: 5 } });
+          await User.findByIdAndUpdate(connection.senderId._id, { $inc: { points: 5 } });
+          // Check "Well Connected" badge
+          const connCount = await Connection.countDocuments({
+            $or: [{ senderId: req.user._id }, { receiverId: req.user._id }],
+            status: 'accepted',
+          });
+          if (connCount >= 20) {
+            await User.findByIdAndUpdate(req.user._id, {
+              $addToSet: { badges: 'Well Connected' },
+            });
+          }
+        } catch { /* ignore */ }
+      })();
     });
   } catch (error) {
     next(error);

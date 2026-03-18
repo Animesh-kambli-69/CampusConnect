@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import UserCard from '../components/UserCard'
 import { getUsers } from '../services/userService'
+import { getTeamRecommendations } from '../services/gamificationService'
 
 const POPULAR_SKILLS = ['React', 'Python', 'JavaScript', 'Machine Learning', 'Node.js', 'Flutter', 'Java', 'Data Science']
 
@@ -33,11 +35,20 @@ function SkeletonCard() {
 function TeamFinderPage() {
   const [skillsFilter, setSkillsFilter] = useState('')
   const [searchInput, setSearchInput] = useState('')
+  const [aiSkills, setAiSkills] = useState('')
+  const [aiQuery, setAiQuery] = useState([])
+  const [showAI, setShowAI] = useState(false)
 
   const { data: users = [], isLoading, isFetching } = useQuery({
     queryKey: ['users', skillsFilter],
     queryFn: () => getUsers(skillsFilter || undefined),
     placeholderData: (prev) => prev,
+  })
+
+  const { data: aiRecs = [], isLoading: aiLoading } = useQuery({
+    queryKey: ['team-match', aiQuery],
+    queryFn: () => getTeamRecommendations(aiQuery),
+    enabled: aiQuery.length > 0,
   })
 
   const handleSearch = useCallback(
@@ -58,6 +69,12 @@ function TeamFinderPage() {
     setSkillsFilter(skill)
   }
 
+  const handleAiMatch = (e) => {
+    e.preventDefault()
+    const skills = aiSkills.split(',').map((s) => s.trim()).filter(Boolean)
+    if (skills.length > 0) setAiQuery(skills)
+  }
+
   const loading = isLoading || isFetching
 
   return (
@@ -73,6 +90,89 @@ function TeamFinderPage() {
             <p className="text-gray-400 mt-1 text-sm">
               Discover talented students and find your perfect teammates for hackathons & projects.
             </p>
+          </div>
+
+          {/* AI Team Match Panel */}
+          <div className="mb-6">
+            <button
+              onClick={() => setShowAI(!showAI)}
+              className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors mb-3"
+            >
+              🤖 AI Team Match {showAI ? '▲' : '▼'}
+            </button>
+            {showAI && (
+              <div className="bg-indigo-950/40 border border-indigo-700/40 rounded-xl p-5">
+                <p className="text-indigo-300 text-sm font-medium mb-3">
+                  Enter the skills your team needs and AI will find the best matches
+                </p>
+                <form onSubmit={handleAiMatch} className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={aiSkills}
+                    onChange={(e) => setAiSkills(e.target.value)}
+                    placeholder="e.g. React, Python, Machine Learning"
+                    className="flex-1 bg-gray-800 border border-indigo-700/50 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!aiSkills.trim()}
+                    className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    🤖 Match
+                  </button>
+                </form>
+
+                {aiLoading && (
+                  <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+                    <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    Finding best matches...
+                  </div>
+                )}
+
+                {!aiLoading && aiQuery.length > 0 && (
+                  <div>
+                    <p className="text-gray-400 text-xs mb-3">
+                      Top matches for: <span className="text-indigo-300">{aiQuery.join(', ')}</span>
+                    </p>
+                    {aiRecs.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No matches found. Try different skills.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {aiRecs.map(({ user, matchPercent }) => (
+                          <Link
+                            key={user._id}
+                            to={`/profile/${user._id}`}
+                            className="flex items-center gap-3 bg-gray-800 rounded-lg px-3 py-2.5 hover:bg-gray-700 transition-colors"
+                          >
+                            {user.avatarUrl ? (
+                              <img src={user.avatarUrl} className="w-9 h-9 rounded-full object-cover" alt="" />
+                            ) : (
+                              <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm text-white font-bold">
+                                {user.name?.[0]?.toUpperCase() || '?'}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white text-sm font-medium">{user.name}</p>
+                              <div className="flex flex-wrap gap-1 mt-0.5">
+                                {user.skills?.slice(0, 3).map((s) => (
+                                  <span key={s} className="text-xs text-indigo-300">{s}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className={`text-sm font-bold ${matchPercent >= 80 ? 'text-green-400' : matchPercent >= 50 ? 'text-yellow-400' : 'text-gray-400'}`}>
+                                {matchPercent}%
+                              </span>
+                              <p className="text-gray-600 text-xs">match</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Search area */}

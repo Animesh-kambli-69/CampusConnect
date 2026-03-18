@@ -198,6 +198,11 @@ function ResourceCard({ resource, currentUserId, onDelete }) {
             {resource.description && (
               <p className="text-gray-500 text-xs mt-0.5 line-clamp-2">{resource.description}</p>
             )}
+            {!resource.description && resource.aiSummary && (
+              <p className="text-gray-500 text-xs mt-0.5 line-clamp-3 italic">
+                🤖 {resource.aiSummary}
+              </p>
+            )}
           </div>
         </div>
         {isOwner && (
@@ -301,7 +306,7 @@ function ResourcesPage() {
           <div className="flex flex-wrap gap-3 mb-6">
             <input
               value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title, subject..."
+              placeholder="Search by title, subject, or AI summary..."
               className="flex-1 min-w-52 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-indigo-500"
             />
             <input

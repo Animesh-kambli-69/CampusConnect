@@ -60,6 +60,15 @@ const eventSchema = new mongoose.Schema(
       ref: 'College',
       required: [true, 'College is required'],
     },
+    attendanceOpen: { type: Boolean, default: false },
+    attendanceToken: { type: String, default: null },
+    attendees: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        name: String,
+        markedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

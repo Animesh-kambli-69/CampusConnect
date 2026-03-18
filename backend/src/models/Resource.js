@@ -17,6 +17,7 @@ const resourceSchema = new mongoose.Schema(
     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     campusId: { type: mongoose.Schema.Types.ObjectId, ref: 'College', required: true },
     downloadsCount: { type: Number, default: 0 },
+    aiSummary: { type: String, default: null },
   },
   { timestamps: true }
 );

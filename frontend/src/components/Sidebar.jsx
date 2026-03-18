@@ -2,13 +2,19 @@ import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/dashboard', icon: '🏠', label: 'Dashboard' },
+  { to: '/announcements', icon: '📢', label: 'Announcements' },
   { to: '/team-finder', icon: '🔍', label: 'Team Finder' },
   { to: '/events', icon: '📅', label: 'Events' },
   { to: '/resources', icon: '📚', label: 'Resources' },
+  { to: '/projects', icon: '🚀', label: 'Projects' },
+  { to: '/placement', icon: '🧑‍💼', label: 'Placement Hub' },
   { to: '/marketplace', icon: '🛒', label: 'Marketplace' },
+  { to: '/lost-found', icon: '📍', label: 'Lost & Found' },
   { to: '/connections', icon: '🔗', label: 'Connections' },
   { to: '/messages', icon: '💬', label: 'Messages' },
   { to: '/workspace', icon: '🗂', label: 'Workspace' },
+  { to: '/study-rooms', icon: '🕐', label: 'Study Rooms' },
+  { to: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
   { to: '/profile', icon: '👤', label: 'My Profile' },
 ]
 
@@ -53,6 +59,19 @@ function Sidebar() {
             >
               <span className="text-base leading-none">➕</span>
               <span>New Listing</span>
+            </NavLink>
+            <NavLink
+              to="/projects/create"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all mt-0.5 ${
+                  isActive
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                }`
+              }
+            >
+              <span className="text-base leading-none">🚀</span>
+              <span>New Project</span>
             </NavLink>
           </div>
         </div>

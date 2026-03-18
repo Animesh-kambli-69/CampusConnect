@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema(
       default: 'student',
     },
     isSuspended: { type: Boolean, default: false },
+    points: { type: Number, default: 0 },
+    badges: { type: [String], default: [] },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

@@ -136,7 +136,7 @@ async function getAllUsers(req, res, next) {
     const skillsParam = req.query.skills;
 
     let skillsFilter = null;
-    if (skillsParam && skillsParam.trim() !== '') {
+    if (skillsParam && typeof skillsParam === 'string' && skillsParam.trim() !== '') {
       skillsFilter = skillsParam
         .split(',')
         .map((s) => s.trim().toLowerCase())

@@ -5,6 +5,12 @@ const College = require('../models/College');
 const Event = require('../models/Event');
 const Resource = require('../models/Resource');
 const Workspace = require('../models/Workspace');
+const Project = require('../models/Project');
+const Connection = require('../models/Connection');
+const Announcement = require('../models/Announcement');
+const InterviewExp = require('../models/InterviewExp');
+const StudyRoom = require('../models/StudyRoom');
+const LostFound = require('../models/LostFound');
 const { generateToken } = require('../utils/jwt');
 
 // ─── Admin Login ─────────────────────────────────────────────────────────────
@@ -227,6 +233,12 @@ async function getAnalytics(req, res, next) {
       totalResources,
       totalEvents,
       totalTeams,
+      totalProjects,
+      totalConnections,
+      totalAnnouncements,
+      totalInterviews,
+      totalStudyRooms,
+      totalLostFound,
     ] = await Promise.all([
       College.countDocuments(),
       College.countDocuments({ isActive: { $ne: false } }),
@@ -235,6 +247,12 @@ async function getAnalytics(req, res, next) {
       Resource.countDocuments(),
       Event.countDocuments(),
       Workspace.countDocuments(),
+      Project.countDocuments(),
+      Connection.countDocuments({ status: 'accepted' }),
+      Announcement.countDocuments(),
+      InterviewExp.countDocuments(),
+      StudyRoom.countDocuments(),
+      LostFound.countDocuments(),
     ]);
 
     // Top 5 campuses by user count
@@ -243,14 +261,7 @@ async function getAnalytics(req, res, next) {
       { $group: { _id: '$collegeId', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 5 },
-      {
-        $lookup: {
-          from: 'colleges',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'college',
-        },
-      },
+      { $lookup: { from: 'colleges', localField: '_id', foreignField: '_id', as: 'college' } },
       { $unwind: '$college' },
       { $project: { name: '$college.name', domain: '$college.domain', count: 1 } },
     ]);
@@ -261,14 +272,24 @@ async function getAnalytics(req, res, next) {
 
     const monthlySignups = await User.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo }, role: { $in: ['student', 'committee'] } } },
-      {
-        $group: {
-          _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, count: { $sum: 1 } } },
       { $sort: { '_id.year': 1, '_id.month': 1 } },
     ]);
+
+    // Role distribution
+    const roleDistribution = await User.aggregate([
+      { $match: { role: { $in: ['student', 'committee', 'campusAdmin'] } } },
+      { $group: { _id: '$role', count: { $sum: 1 } } },
+    ]);
+
+    // Top 5 users by points (gamification leaderboard)
+    const topPointUsers = await User.find(
+      { role: { $in: ['student', 'committee'] }, points: { $gt: 0 } },
+      { name: 1, points: 1, badges: 1, collegeId: 1 }
+    )
+      .sort({ points: -1 })
+      .limit(5)
+      .populate('collegeId', 'name');
 
     res.status(200).json({
       success: true,
@@ -281,9 +302,17 @@ async function getAnalytics(req, res, next) {
           totalResources,
           totalEvents,
           totalTeams,
+          totalProjects,
+          totalConnections,
+          totalAnnouncements,
+          totalInterviews,
+          totalStudyRooms,
+          totalLostFound,
         },
         topCampuses,
         monthlySignups,
+        roleDistribution,
+        topPointUsers,
       },
     });
   } catch (error) {

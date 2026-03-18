@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const path = require('path');
 const Resource = require('../models/Resource');
 const { uploadToS3, getPresignedDownloadUrl, deleteFromS3 } = require('../config/s3');
+const { logActivity } = require('../utils/activity');
+const { grokClient } = require('../config/gemini');
 
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -18,6 +20,35 @@ const ALLOWED_MIME_TYPES = new Set([
   'application/x-zip-compressed',
   'application/octet-stream',
 ]);
+
+// Background: extract PDF text and generate AI summary via Groq
+async function generateAiSummary(resourceId, fileBuffer, mimetype) {
+  try {
+    if (mimetype !== 'application/pdf') return;
+    const pdfParse = require('pdf-parse');
+    const parsed = await pdfParse(fileBuffer);
+    const text = parsed.text.slice(0, 4000); // limit tokens
+    if (!text.trim()) return;
+
+    const completion = await grokClient.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'user',
+          content: `Summarize this academic document in 3-5 sentences. Focus on the key topics covered:\n\n${text}`,
+        },
+      ],
+      max_tokens: 300,
+    });
+
+    const summary = completion.choices[0]?.message?.content?.trim();
+    if (summary) {
+      await Resource.findByIdAndUpdate(resourceId, { aiSummary: summary });
+    }
+  } catch (err) {
+    console.warn('[AI Summary] Failed:', err.message);
+  }
+}
 
 // POST /api/resources
 const uploadResource = async (req, res) => {
@@ -59,6 +90,34 @@ const uploadResource = async (req, res) => {
 
     await resource.populate('uploadedBy', 'name avatarUrl');
     res.status(201).json({ success: true, data: { resource } });
+
+    const fileBuffer = req.file.buffer;
+    const mimetype = req.file.mimetype;
+
+    setImmediate(() => {
+      logActivity({
+        type: 'resource:uploaded',
+        actor: req.user,
+        meta: { resourceId: resource._id, title: resource.title, subject: resource.subject },
+        collegeId: campusId,
+      });
+      generateAiSummary(resource._id, fileBuffer, mimetype);
+
+      // Award points
+      (async () => {
+        try {
+          const User = require('../models/User');
+          await User.findByIdAndUpdate(req.user._id, { $inc: { points: 20 } });
+          // Check "Resource Hero" badge
+          const count = await Resource.countDocuments({ uploadedBy: req.user._id });
+          if (count >= 5) {
+            await User.findByIdAndUpdate(req.user._id, {
+              $addToSet: { badges: 'Resource Hero' },
+            });
+          }
+        } catch { /* ignore */ }
+      })();
+    });
   } catch (err) {
     console.error('uploadResource error:', err);
     res.status(500).json({ success: false, message: 'Failed to upload resource.' });
@@ -80,6 +139,7 @@ const getResources = async (req, res) => {
         { title: { $regex: search, $options: 'i' } },
         { subject: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
+        { aiSummary: { $regex: search, $options: 'i' } },
       ];
     }
 

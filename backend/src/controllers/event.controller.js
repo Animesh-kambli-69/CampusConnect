@@ -1,10 +1,12 @@
 'use strict';
 
+const crypto = require('crypto');
 const { validationResult } = require('express-validator');
 const Event = require('../models/Event');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const { getIO } = require('../config/socket');
+const { logActivity } = require('../utils/activity');
 
 function handleValidationErrors(req, res) {
   const errors = validationResult(req);
@@ -105,6 +107,15 @@ async function createEvent(req, res, next) {
       message: 'Event created successfully.',
       data: { event },
     });
+
+    setImmediate(() => {
+      logActivity({
+        type: 'event:created',
+        actor: req.user,
+        meta: { eventId: event._id, title: event.title },
+        collegeId,
+      });
+    });
   } catch (error) {
     next(error);
   }
@@ -137,4 +148,116 @@ async function getEventById(req, res, next) {
   }
 }
 
-module.exports = { getEvents, createEvent, getEventById };
+/**
+ * POST /api/events/:id/attendance/open
+ * Organizer opens attendance — generates a one-time token.
+ */
+async function openAttendance(req, res, next) {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
+
+    if (event.organizer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only the organizer can manage attendance.' });
+    }
+
+    event.attendanceToken = crypto.randomBytes(16).toString('hex');
+    event.attendanceOpen = true;
+    await event.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Attendance opened.',
+      data: { token: event.attendanceToken, eventId: event._id },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/events/:id/attendance/close
+ * Organizer closes attendance.
+ */
+async function closeAttendance(req, res, next) {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
+
+    if (event.organizer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only the organizer can manage attendance.' });
+    }
+
+    event.attendanceOpen = false;
+    await event.save();
+
+    res.status(200).json({ success: true, message: 'Attendance closed.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/events/:id/attendance/mark
+ * Student marks their attendance using the token.
+ */
+async function markAttendance(req, res, next) {
+  try {
+    const { token } = req.body;
+    const event = await Event.findById(req.params.id);
+
+    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
+    if (!event.attendanceOpen) {
+      return res.status(400).json({ success: false, message: 'Attendance is not open for this event.' });
+    }
+    if (event.attendanceToken !== token) {
+      return res.status(400).json({ success: false, message: 'Invalid attendance token.' });
+    }
+
+    const alreadyMarked = event.attendees.some(
+      (a) => a.userId.toString() === req.user._id.toString()
+    );
+    if (alreadyMarked) {
+      return res.status(200).json({ success: true, message: 'Attendance already marked.', alreadyMarked: true });
+    }
+
+    event.attendees.push({ userId: req.user._id, name: req.user.name });
+    await event.save();
+
+    res.status(200).json({ success: true, message: 'Attendance marked successfully!' });
+
+    // Award points for attending
+    setImmediate(async () => {
+      try {
+        await User.findByIdAndUpdate(req.user._id, { $inc: { points: 10 } });
+      } catch { /* ignore */ }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * GET /api/events/:id/attendance
+ * Organizer fetches the attendee list.
+ */
+async function getAttendees(req, res, next) {
+  try {
+    const event = await Event.findById(req.params.id).select('organizer attendees attendanceOpen');
+    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
+
+    if (event.organizer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only the organizer can view attendees.' });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: event.attendees.length,
+      data: { attendees: event.attendees, attendanceOpen: event.attendanceOpen },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { getEvents, createEvent, getEventById, openAttendance, closeAttendance, markAttendance, getAttendees };

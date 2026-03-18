@@ -69,6 +69,15 @@ function init(httpServer) {
       });
     });
 
+    // ── Study Room collaboration ─────────────────────────────────────────
+    socket.on('studyroom:join', (roomId) => {
+      if (roomId) socket.join(`studyroom:${roomId}`);
+    });
+
+    socket.on('studyroom:leave', (roomId) => {
+      if (roomId) socket.leave(`studyroom:${roomId}`);
+    });
+
     socket.on('disconnect', () => {
       // cleanup handled automatically by socket.io
     });
