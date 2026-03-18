@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { io } from 'socket.io-client'
@@ -26,6 +26,7 @@ function formatTime(seconds) {
 
 function StudyRoomDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const token = useUserStore((state) => state.token)
   const queryClient = useQueryClient()
@@ -46,7 +47,11 @@ function StudyRoomDetailPage() {
 
   const leaveMutation = useMutation({
     mutationFn: () => leaveStudyRoom(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['study-room', id] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['study-room', id] })
+      setShowLeaveModal(false)
+      navigate('/study-rooms')
+    },
   })
 
   const timerMutation = useMutation({
